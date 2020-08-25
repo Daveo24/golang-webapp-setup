@@ -1,15 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
+var templates *template.Template
+
 func main() {
-	http.HandleFunc("/", indexPage)
+	templates = template.Must(templates.ParseGlob("templates/*.html"))
+	r := mux.NewRouter()
+	r.HandleFunc("/", indexPage).Methods("GET")
+	http.Handle("/", r)
 	http.ListenAndServe(":8000", nil)
 }
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, Gophers")
+	templates.ExecuteTemplate(w, "index.html", nil)
 }
